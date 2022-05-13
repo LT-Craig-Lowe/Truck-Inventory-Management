@@ -1,0 +1,72 @@
+﻿@page "/"
+
+<div class="container-fluid">
+	<div class="row" style="margin-bottom: 50px;">
+		<div class="col-1" />
+		<div class="col-10">
+			<div class="text-center">
+				<img src="/images/pngegg.png" class="img-fluid" style="width:60%; height:60%;" />
+			</div>
+			<div class="col-1" />
+		</div>
+	</div>
+	<div class="row" style="margin-bottom: 50px;">
+		<div class="col-1"/>
+		<div class="col-10">
+			<span style="color: #555555; font-size: 1.0rem; font-weight: bold;">Search</span>
+			<input type="text" @bind="FilterString" style="width: 88%;"/>
+			<button class="btn btn-outline-info oi oi-magnifying-glass" style="margin-bottom: 5px;" title="Search for a truck in the inventory." @onclick="() => OnSearchClick()"/>
+		</div>
+		<div class="col-1"/>
+	</div>
+	<div class="row">
+		<div class="col-1" />
+		<div class="col-10" style="padding-bottom: 8px;">
+			<div style="font-size: 1.0rem; font-weight: bold;">
+				<div style="float: left;">
+					<span style="color: #555555;">Current Truck Inventory</span>
+				</div>
+				<div style="float:right;">
+					@if (!string.IsNullOrWhiteSpace(Message))
+					{
+						<span class="@(Error ? "alert-danger border-danger" : "alert-success border-success")" style="margin-right: 20px; padding: 2px;">@Message</span>
+					}
+					<button class="btn btn-outline-info oi oi-plus" title="Add a new truck to the inventory." @onclick="() => OnAddTruckClick()"/>
+				</div>
+			</div>
+		</div>
+		<div class="col-1" />
+	</div>
+	<div class="row">
+		<div class="col-1" />
+		<div class="col-10">
+			<table class="table">
+				<thead>
+					<tr style="background-color: #dee2e6; border-bottom: none; font-size: 0.9rem;">
+						<th scope="col">Chassis Number</th>
+						<th scope="col">Model Family</th>
+						<th scope="col">Model Number</th>
+						<th scope="col">Customer</th>
+						<th scope="col">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach(var truck in _currentTruckInventory)
+					{
+					<tr>
+						<td>@truck.ChassisNumber</td>
+						<td>@truck.ModelFamily</td>
+						<td>@truck.ModelNumber</td>
+						<td>@truck.Customer</td>
+						<td>
+							<button class="btn btn-outline-info oi oi-pencil" title="Edit current vehicle?"/>
+							<button class="btn btn-outline-danger oi oi-trash" title="Remove current vehicle?"/>
+						</td>
+					</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		<div class="col-1" />
+	</div>
+</div>

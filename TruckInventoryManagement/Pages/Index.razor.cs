@@ -57,6 +57,48 @@ namespace TruckInventoryManagement.Pages
             }
         }
 
+        protected async void OnEditTruckClick(TruckInventoryModel truck)
+        {
+            var title = "Edit Truck";
+            ModalParameters parameters = new ModalParameters();
+            parameters.Add("CurrentChassisNumber", truck.ChassisNumber);
+            parameters.Add("CurrentCustomer", truck.Customer);
+            parameters.Add("CurrentModelFamily", truck.ModelFamily);
+            parameters.Add("CurrentModelNumber", truck.ModelNumber);
+            var options = GetModelOptions();
+            var response = ModalService.Show<EditTruck>(title, parameters, options);
+            var modalResult = await response.Result;
+
+            if (modalResult != null && modalResult.Data != null)
+            {
+                var truckResponseDto = (TruckInventoryResponseDto)modalResult.Data;
+
+                Error = !truckResponseDto.Successful;
+                Message = truckResponseDto.Message;
+                _currentTruckInventory = await TruckInventoryService.GetTruckInventoryList();
+                StateHasChanged();
+            }
+        }
+
+       protected async void OnRemoveTruckClick(string ChassisNumberForDelete)
+        {
+            var title = "Remove Truck from Inventory?";
+            var options = GetModelOptions();
+            var response = ModalService.Show<RemoveTruck>(title, options);
+            var modalResult = await response.Result;
+
+            if (modalResult != null && modalResult.Data != null)
+            {
+                var truckResponseDto = (TruckInventoryResponseDto)modalResult.Data;
+
+                Error = !truckResponseDto.Successful;
+                Message = truckResponseDto.Message;
+                await TruckInventoryService.RemoveTruckFromInventory(ChassisNumberForDelete);
+                _currentTruckInventory = await TruckInventoryService.GetTruckInventoryList();
+                StateHasChanged();
+            }
+        }
+
         private ModalOptions GetModelOptions()
         {
             return new ModalOptions()

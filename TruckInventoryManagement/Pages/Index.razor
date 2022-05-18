@@ -59,8 +59,8 @@
 						<td>@truck.ModelNumber</td>
 						<td>@truck.Customer</td>
 						<td>
-							<button class="btn btn-outline-info oi oi-pencil" title="Edit current vehicle?"/>
-							<button class="btn btn-outline-danger oi oi-trash" title="Remove current vehicle?"/>
+							<button class="btn btn-outline-info oi oi-pencil" title="Edit current vehicle?" @onclick="() => OnEditTruckClick(truck)"/>
+							<button class="btn btn-outline-danger oi oi-trash" title="Remove current vehicle?" @onclick="() => OnRemoveTruckClick(truck.ChassisNumber)"/>
 						</td>
 					</tr>
 					}

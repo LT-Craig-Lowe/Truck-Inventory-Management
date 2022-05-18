@@ -31,7 +31,8 @@ namespace TruckInventoryManagement.Data
                 return responseDto;
             }
 
-            if (_truckInventory.Any())
+            //Insert a new record, if the chassis number is unique.
+            if (_truckInventory.Any(truck => truck.ChassisNumber == addRequest.ChassisNumber))
             {
                 responseDto.Successful = false;
                 responseDto.Message = $"A truck with chassis number {addRequest.ChassisNumber} already exists in the inventory. Please enter a unique vehicle chassis number.";
@@ -44,6 +45,7 @@ namespace TruckInventoryManagement.Data
             return responseDto;
         }
 
+        //Remove the truck from inventory, prompting user confirmation first
         public async Task<TruckInventoryResponseDto> RemoveTruckFromInventory(string chassisNumber)
         {
             var responseDto = new TruckInventoryResponseDto();
@@ -64,19 +66,35 @@ namespace TruckInventoryManagement.Data
 
         public async Task<List<TruckInventoryModel>> GetFilteredTruckInventory(string searchString)
         {
+            if(string.IsNullOrEmpty(searchString))
+            {
+                //No search criteria - return entire List as no further processing required
+                return _truckInventory.ToList();
+            }
+
             var filteredByChassisResults = _truckInventory.Where(truck => truck.ChassisNumber.StartsWith(searchString) || truck.ChassisNumber.EndsWith(searchString) || truck.ChassisNumber.Contains(searchString));
             var filteredByModelFamily = _truckInventory.Where(truck => truck.ModelFamily.StartsWith(searchString) || truck.ModelFamily.EndsWith(searchString) || truck.ModelFamily.Contains(searchString));
             var filteredByModelNumber = _truckInventory.Where(truck => truck.ModelNumber.StartsWith(searchString) || truck.ModelNumber.EndsWith(searchString) || truck.ModelNumber.Contains(searchString));
             var filteredByCustomer = _truckInventory.Where(truck => truck.Customer.StartsWith(searchString) || truck.Customer.EndsWith(searchString) || truck.Customer.Contains(searchString));
 
             var filteredResults = new List<TruckInventoryModel>();
-            filteredResults.AddRange(filteredByChassisResults);
-            filteredResults.AddRange(filteredByModelFamily);
-            filteredResults.AddRange(filteredByModelNumber);
-            filteredResults.AddRange(filteredByCustomer);
+
+            //Catch exceptions related to the results
+            try
+            {
+                filteredResults.AddRange(filteredByChassisResults);
+                filteredResults.AddRange(filteredByModelFamily);
+                filteredResults.AddRange(filteredByModelNumber);
+                filteredResults.AddRange(filteredByCustomer);
+            }
+
+            catch (Exception)
+            {
+                //TODO: Handle any errors when an exception is thrown (likely from a lack of a search criteria)
+                filteredResults = _truckInventory.ToList();
+            }
 
             var distinctResults = filteredResults.ToList();
-
             return distinctResults;
         }
 
@@ -96,6 +114,8 @@ namespace TruckInventoryManagement.Data
             truck.ModelFamily = editTruckRequestDto.ModelFamily;
             truck.ModelNumber = editTruckRequestDto.ModelNumber;
             truck.Customer = editTruckRequestDto.Customer;
+            responseDto.Successful = true;
+            responseDto.Message = $"Truck details for Chassis Number: {truck.ChassisNumber} successfully updated.";
             return responseDto;
         }
 
